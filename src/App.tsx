@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BaliNeraProvider, useBaliNera } from './context/BaliNeraContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -8,6 +8,9 @@ import AdminPanel from './components/AdminPanel';
 
 function BaliNeraInteriorApp() {
   const { currentUser } = useBaliNera();
+  
+  // Manage admin's view state ('admin' console or 'user' dashboard preview)
+  const [adminViewState, setAdminViewState] = useState<'admin' | 'user'>('admin');
 
   // Scroll to targeted section for standard layout navigation
   const handleScrollToSection = (sectionId: string) => {
@@ -26,12 +29,20 @@ function BaliNeraInteriorApp() {
     <div className="min-h-screen bg-slate-50 flex flex-col justify-between font-sans selection:bg-emerald-100 selection:text-emerald-900">
       
       {/* Shared Responsive Header */}
-      <Navbar onScrollToSection={handleScrollToSection} />
+      <Navbar 
+        onScrollToSection={handleScrollToSection} 
+        adminViewState={adminViewState}
+        setAdminViewState={setAdminViewState}
+      />
 
       {/* Main Board Routing */}
       <div className="flex-1 animate-fade-in">
         {currentUser.role === 'admin' ? (
-          <AdminPanel />
+          adminViewState === 'admin' ? (
+            <AdminPanel onViewUserDashboard={() => setAdminViewState('user')} />
+          ) : (
+            <UserExplorer />
+          )
         ) : (
           <UserExplorer />
         )}

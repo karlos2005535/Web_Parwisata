@@ -29,6 +29,14 @@ export default function UserExplorer() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<'Bank Transfer' | 'QRIS' | 'Cash'>('Bank Transfer');
   const [bookingFinished, setBookingFinished] = useState(false);
   const [currentBookingId, setCurrentBookingId] = useState('');
+  const [selectedBank, setSelectedBank] = useState('');
+
+  // Sync selected bank with dynamic payment settings on load
+  useEffect(() => {
+    if (paymentSetting?.bankName) {
+      setSelectedBank(paymentSetting.bankName);
+    }
+  }, [paymentSetting?.bankName]);
 
   // Complaint states
   const [complaintSpot, setComplaintSpot] = useState('');
@@ -518,22 +526,77 @@ export default function UserExplorer() {
                 <div className="bg-bali-gold/5 p-4 rounded-lg border border-bali-gold/30 space-y-3 font-sans text-xs">
                   
                   {selectedPaymentMethod === 'Bank Transfer' && (
-                    <div className="space-y-2">
-                      <p className="font-serif font-bold text-bali-green flex items-center gap-1.5">
+                    <div className="space-y-3.5">
+                      <p className="font-serif font-bold text-bali-green flex items-center gap-1.5 border-b border-bali-green/5 pb-1">
                         <Landmark className="w-4 h-4 text-bali-accent" />
-                        <span>Detail Rekening Offline {paymentSetting.bankName}</span>
+                        <span>Kanal Transfer Bank Mandiri & Swasta</span>
                       </p>
-                      <div className="bg-bali-sand p-3 rounded border border-bali-gold/25 space-y-1.5 text-[11px] font-mono">
-                        <div className="flex justify-between">
-                          <span className="text-bali-green/55">Nomor Rekening:</span>
-                          <span className="font-extrabold text-bali-green select-all">{paymentSetting.accountNumber}</span>
+                      
+                      {/* Bank Select Dropdown */}
+                      <div className="space-y-1 text-left">
+                        <label className="text-[9px] font-bold text-bali-green/50 uppercase tracking-wider block font-sans">
+                          Pilih Bank Rekening Penerima:
+                        </label>
+                        <select 
+                          value={selectedBank || paymentSetting.bankName}
+                          onChange={(e) => setSelectedBank(e.target.value)}
+                          className="w-full px-3 py-2 bg-white border border-bali-green/15 focus:border-bali-accent rounded-xl text-xs font-semibold text-bali-green focus:outline-none transition"
+                        >
+                          <option value={paymentSetting.bankName}>{paymentSetting.bankName} (Sesuai Konfigurasi Default)</option>
+                          {paymentSetting.bankName !== 'Bank BCA' && <option value="Bank BCA">Bank BCA (Transfer Instan)</option>}
+                          {paymentSetting.bankName !== 'Bank Mandiri' && <option value="Bank Mandiri">Bank Mandiri (Persero)</option>}
+                          {paymentSetting.bankName !== 'Bank BNI' && <option value="Bank BNI">Bank BNI (Negara Indonesia)</option>}
+                          {paymentSetting.bankName !== 'Bank BRI' && <option value="Bank BRI">Bank BRI (Rakyat Indonesia)</option>}
+                          {paymentSetting.bankName !== 'Bank CIMB Niaga' && <option value="Bank CIMB Niaga">Bank CIMB Niaga</option>}
+                        </select>
+                      </div>
+
+                      {/* Display Selected Bank Details */}
+                      <div className="bg-white p-3.5 rounded-xl border border-bali-gold/20 space-y-2 text-[11px] font-mono leading-relaxed">
+                        <div className="flex justify-between items-center">
+                          <span className="text-bali-green/55">Nama Bank:</span>
+                          <span className="font-extrabold text-bali-green">{selectedBank || paymentSetting.bankName}</span>
                         </div>
-                        <div className="flex justify-between">
+                        <div className="flex justify-between items-center">
+                          <span className="text-bali-green/55">Nomor Rekening:</span>
+                          <span className="font-extrabold text-bali-green select-all text-xs tracking-wider">
+                            {(() => {
+                              const activeB = selectedBank || paymentSetting.bankName;
+                              if (activeB === paymentSetting.bankName) {
+                                return paymentSetting.accountNumber;
+                              }
+                              const presets: Record<string, string> = {
+                                'Bank BCA': '812-3456-7890',
+                                'Bank BNI': '098-765-4321',
+                                'Bank BRI': '0012-01-000456-501',
+                                'Bank Mandiri': '142-00-19205-291',
+                                'Bank CIMB Niaga': '702-89-12345-00'
+                              };
+                              return presets[activeB] || paymentSetting.accountNumber;
+                            })()}
+                          </span>
+                        </div>
+                        <div className="flex justify-between items-center">
                           <span className="text-bali-green/55">Atas Nama (A.N):</span>
-                          <span className="font-bold text-bali-green">{paymentSetting.accountHolder}</span>
+                          <span className="font-bold text-bali-green text-right">
+                            {(() => {
+                              const activeB = selectedBank || paymentSetting.bankName;
+                              if (activeB === paymentSetting.bankName) {
+                                return paymentSetting.accountHolder;
+                              }
+                              const presetsItems: Record<string, string> = {
+                                'Bank BCA': 'Thomas Karlos Baco (PT BaliNera)',
+                                'Bank BNI': 'PT BaliNera Dewata Wisata',
+                                'Bank BRI': 'Thomas Karlos Baco (PT BaliNera)',
+                                'Bank Mandiri': 'Thomas Karlos Baco (PT BaliNera)',
+                                'Bank CIMB Niaga': 'PT BaliNera Pariwisata'
+                              };
+                              return presetsItems[activeB] || paymentSetting.accountHolder;
+                            })()}
+                          </span>
                         </div>
                       </div>
-                      <p className="text-[10px] text-bali-green/65 leading-relaxed italic">*Silakan transfer nominal tiket penuh dan simpan tanda terima digital.</p>
+                      <p className="text-[10px] text-bali-green/65 leading-relaxed italic">*Silakan transfer nominal tiket penuh dan simpan bukti transaksi Anda.</p>
                     </div>
                   )}
 

@@ -71,7 +71,11 @@ const PRESET_BALI_LOGOS = [
   }
 ];
 
-export default function AdminPanel() {
+interface AdminPanelProps {
+  onViewUserDashboard?: () => void;
+}
+
+export default function AdminPanel({ onViewUserDashboard }: AdminPanelProps) {
   const {
     users,
     destinations,
@@ -120,6 +124,7 @@ export default function AdminPanel() {
         setSpotImage(base64Value);
       } else {
         setSiteLogo(base64Value);
+        updateSiteInfo(siteName, base64Value, siteSlogan);
       }
       
       setCustomGallery(prev => {
@@ -396,6 +401,19 @@ export default function AdminPanel() {
               <MessageSquare className="w-4 h-4 text-bali-accent" />
               <span>Live Chat Konsultasi</span>
             </button>
+
+            {onViewUserDashboard && (
+              <div className="pt-4 border-t border-bali-green/10 mt-3.5">
+                <button
+                  type="button"
+                  onClick={onViewUserDashboard}
+                  className="w-full text-left py-3.5 px-4 rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer flex items-center gap-3 transition bg-bali-accent text-bali-sand hover:bg-bali-accent/95 shadow-md active:scale-95"
+                >
+                  <Globe className="w-4 h-4 text-bali-sand" />
+                  <span>Lihat Web Wisata</span>
+                </button>
+              </div>
+            )}
 
           </div>
         </aside>
@@ -783,6 +801,7 @@ export default function AdminPanel() {
                                   type="button"
                                   onClick={() => { 
                                     setSiteLogo(item.url); 
+                                    updateSiteInfo(siteName, item.url, siteSlogan);
                                     setShowLogoGallery(false); 
                                   }}
                                   className="p-2 border border-gray-100 hover:border-bali-gold rounded-xl flex flex-col items-center justify-center gap-1.5 transition text-left cursor-pointer bg-slate-50/50"
@@ -810,7 +829,11 @@ export default function AdminPanel() {
                                 {customGallery.map((img, i) => (
                                   <div 
                                     key={i}
-                                    onClick={() => { setSiteLogo(img); setShowLogoGallery(false); }}
+                                    onClick={() => { 
+                                      setSiteLogo(img); 
+                                      updateSiteInfo(siteName, img, siteSlogan);
+                                      setShowLogoGallery(false); 
+                                    }}
                                     className="group relative cursor-pointer overflow-hidden rounded-lg border border-gray-100 hover:border-bali-gold transition"
                                   >
                                     <img 
