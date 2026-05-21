@@ -1,0 +1,6 @@
+{
+  "name": "BaliNera",
+  "description": "BaliNera - Discover and Book Majestic Bali Destinations. Secure User Gateway, Dynamic Destination Management, Admin Control Panels, Payment Config, Complaints Portal, and Real-time Simulated Live Chat.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
